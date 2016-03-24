@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rules\Exception\EvaluationException.
- */
-
 namespace Drupal\rules\Exception;
 
 /**

@@ -1,23 +1,19 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rules\Form\Expression\ActionSetForm.
- */
-
 namespace Drupal\rules\Form\Expression;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\Core\Url;
+use Drupal\rules\Ui\RulesUiHandlerTrait;
 use Drupal\rules\Engine\ActionExpressionContainerInterface;
 
 /**
- * Form view structure for Rules action sets.
+ * Form handler for action containers.
  */
-class ActionSetForm implements ExpressionFormInterface {
+class ActionContainerForm implements ExpressionFormInterface {
 
   use StringTranslationTrait;
+  use RulesUiHandlerTrait;
   use ExpressionFormTrait;
 
   /**
@@ -58,15 +54,13 @@ class ActionSetForm implements ExpressionFormInterface {
             '#links' => [
               'edit' => [
                 'title' => $this->t('Edit'),
-                'url' => Url::fromRoute('entity.rules_reaction_rule.edit_form.expression.edit', [
-                  'rules_reaction_rule' => $this->actionSet->getRoot()->getConfigEntityId(),
+                'url' => $this->getRulesUiHandler()->getUrlFromRoute('expression.edit', [
                   'uuid' => $action->getUuid(),
                 ]),
               ],
               'delete' => [
                 'title' => $this->t('Delete'),
-                'url' => Url::fromRoute('entity.rules_reaction_rule.edit_form.expression.delete', [
-                  'rules_reaction_rule' => $this->actionSet->getRoot()->getConfigEntityId(),
+                'url' => $this->getRulesUiHandler()->getUrlFromRoute('expression.delete', [
                   'uuid' => $action->getUuid(),
                 ]),
               ],
@@ -82,8 +76,7 @@ class ActionSetForm implements ExpressionFormInterface {
       '#theme' => 'menu_local_action',
       '#link' => [
         'title' => $this->t('Add action'),
-        'url' => Url::fromRoute('entity.rules_reaction_rule.edit_form.expression.add', [
-          'rules_reaction_rule' => $this->actionSet->getRoot()->getConfigEntityId(),
+        'url' => $this->getRulesUiHandler()->getUrlFromRoute('expression.add', [
           'expression_id' => 'rules_action',
         ]),
       ],

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rules\Engine\ExecutionMetadataStateInterface.
- */
-
 namespace Drupal\rules\Engine;
 
 use Drupal\Core\Language\LanguageInterface;
@@ -79,12 +74,13 @@ interface ExecutionMetadataStateInterface {
    * @param string $property_path
    *   The property path, example: "node:title:value".
    * @param string $langcode
-   *   The langauge code.
+   *   The language code.
    *
    * @return \Drupal\Core\TypedData\DataDefinitionInterface
    *   A data definition if the property path could be applied.
    *
    * @throws \Drupal\rules\Exception\IntegrityException
+   *   Thrown if the property path is invalid.
    */
   public function fetchDefinitionByPropertyPath($property_path, $langcode = LanguageInterface::LANGCODE_NOT_SPECIFIED);
 

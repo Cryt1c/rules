@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\rules\Integration\Action\EntityFetchByFieldTest.
- */
-
 namespace Drupal\Tests\rules\Integration\Action;
 
 use Drupal\Core\Entity\EntityInterface;
@@ -172,7 +167,7 @@ class EntityFetchByFieldTest extends RulesEntityIntegrationTestBase {
    */
   public function testRefiningContextDefinitions() {
     $this->action->setContextValue('type', 'entity_test');
-    $this->action->refineContextDefinitions();
+    $this->action->refineContextDefinitions([]);
     $this->assertEquals(
       $this->action->getProvidedContextDefinition('entity_fetched')
         ->getDataType(), 'entity:entity_test'

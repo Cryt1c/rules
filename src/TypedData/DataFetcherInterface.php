@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains Drupal\rules\TypedData\DataFetcherInterface.
- */
-
 namespace Drupal\rules\TypedData;
 
 use Drupal\Core\Render\BubbleableMetadata;
@@ -103,5 +98,23 @@ interface DataFetcherInterface {
    *   existing property is referenced.
    */
   public function fetchDefinitionBySubPaths(DataDefinitionInterface $data_definition, array $sub_paths, $langcode = NULL);
+
+  /**
+   * Provides autocomplete suggestions for an incomplete property path.
+   *
+   * @param \Drupal\Core\TypedData\DataDefinitionInterface[] $data_definitions
+   *   A map of available data definitions that should be seareched. The array
+   *   keys are the first part of the property path.
+   * @param string $partial_property_path
+   *   The partial property path, example: "node.uid.ent".
+   *
+   * @return array[]
+   *   A list of autocomplete suggestions - valid property paths for one of the
+   *   provided data definitions. Each entry is an array with the following
+   *   keys:
+   *   - value: the data selecor property path.
+   *   - label: the human readable label suggestion.
+   */
+  public function autocompletePropertyPath(array $data_definitions, $partial_property_path);
 
 }

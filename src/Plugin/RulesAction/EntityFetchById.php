@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rules\Plugin\RulesAction\EntityFetchById.
- */
-
 namespace Drupal\rules\Plugin\RulesAction;
 
 use Drupal\rules\Core\RulesActionBase;
@@ -81,7 +76,7 @@ class EntityFetchById extends RulesActionBase implements ContainerFactoryPluginI
   /**
    * {@inheritdoc}
    */
-  public function refineContextDefinitions() {
+  public function refineContextDefinitions(array $selected_data) {
     if ($type = $this->getContextValue('type')) {
       $this->pluginDefinition['provides']['entity_fetched']->setDataType("entity:$type");
     }

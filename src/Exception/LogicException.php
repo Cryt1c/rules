@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rules\Exception\LogicException.
- */
-
 namespace Drupal\rules\Exception;
 
 /**

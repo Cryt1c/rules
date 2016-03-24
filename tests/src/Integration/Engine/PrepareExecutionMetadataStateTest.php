@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\rules\Integration\Engine\PrepareExecutionMetadataStateTest.
- */
-
 namespace Drupal\Tests\rules\Integration\Engine;
 
 use Drupal\rules\Context\ContextConfig;
@@ -34,7 +29,7 @@ class PrepareExecutionMetadataStateTest extends RulesEntityIntegrationTestBase {
     $state = ExecutionMetadataState::create();
     $found = $rule->prepareExecutionMetadataState($state);
     $this->assertTrue($state->hasDataDefinition('result'));
-    $this->assertTrue($found);
+    $this->assertNull($found);
   }
 
   /**
@@ -113,7 +108,7 @@ class PrepareExecutionMetadataStateTest extends RulesEntityIntegrationTestBase {
 
     $found = $rule->prepareExecutionMetadataState($state);
     $this->assertFalse($state->hasDataDefinition('list_item'));
-    $this->assertTrue($found);
+    $this->assertNull($found);
   }
 
 }

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rules\Plugin\RulesExpression\ActionSet.
- */
-
 namespace Drupal\rules\Plugin\RulesExpression;
 
 use Drupal\rules\Engine\ActionExpressionContainer;
@@ -16,10 +11,17 @@ use Drupal\rules\Engine\ExecutionStateInterface;
  * @RulesExpression(
  *   id = "rules_action_set",
  *   label = @Translation("Action set"),
- *   form_class = "\Drupal\rules\Form\Expression\ActionSetForm"
+ *   form_class = "\Drupal\rules\Form\Expression\ActionContainerForm"
  * )
  */
 class ActionSet extends ActionExpressionContainer {
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function allowsMetadataAssertions() {
+    return TRUE;
+  }
 
   /**
    * {@inheritdoc}

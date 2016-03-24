@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rules\Core\RulesEventManager.
- */
-
 namespace Drupal\rules\Core;
 
 use Drupal\Component\Plugin\CategorizingPluginManagerInterface;
@@ -49,6 +44,26 @@ class RulesEventManager extends DefaultPluginManager implements CategorizingPlug
   /**
    * {@inheritdoc}
    */
+  public function createInstance($plugin_id, array $configuration = []) {
+    // If a fully qualified event name is passed, be sure to get the base name
+    // first.
+    $plugin_id = $this->getEventBaseName($plugin_id);
+    return parent::createInstance($plugin_id, $configuration);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getDefinition($plugin_id, $exception_on_invalid = TRUE) {
+    // If a fully qualified event name is passed, be sure to get the base name
+    // first.
+    $plugin_id = $this->getEventBaseName($plugin_id);
+    return parent::getDefinition($plugin_id, $exception_on_invalid);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function processDefinition(&$definition, $plugin_id) {
     parent::processDefinition($definition, $plugin_id);
     if (!isset($definition['context'])) {
@@ -58,6 +73,26 @@ class RulesEventManager extends DefaultPluginManager implements CategorizingPlug
     foreach ($definition['context'] as $context_name => $values) {
       $definition['context'][$context_name] = ContextDefinition::createFromArray($values);
     }
+  }
+
+  /**
+   * Gets the base name of a configured event name.
+   *
+   * For a configured event name like {EVENT_NAME}--{SUFFIX}, the base event
+   * name {EVENT_NAME} is returned.
+   *
+   * @return string
+   *   The event base name.
+   *
+   * @see \Drupal\rules\Core\RulesConfigurableEventHandlerInterface::getEventNameSuffix()
+   */
+  public function getEventBaseName($event_name) {
+    // Cut off any suffix from a configured event name.
+    if (strpos($event_name, '--') !== FALSE) {
+      $parts = explode('--', $event_name, 2);
+      return $parts[0];
+    }
+    return $event_name;
   }
 
 }

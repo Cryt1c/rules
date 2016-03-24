@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rules\Plugin\RulesExpression\RulesAnd.
- */
-
 namespace Drupal\rules\Plugin\RulesExpression;
 
 use Drupal\rules\Engine\ConditionExpressionContainer;
@@ -45,6 +40,15 @@ class RulesAnd extends ConditionExpressionContainer {
     // An empty AND should return FALSE, otherwise all conditions evaluated to
     // TRUE and we return TRUE.
     return !empty($this->conditions);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function allowsMetadataAssertions() {
+    // If the AND is not negated, all child-expressions must be executed - thus
+    // assertions can be added it.
+    return !$this->isNegated();
   }
 
 }

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\rules\Kernel\ConfigEntityDefaultsTest.
- */
-
 namespace Drupal\Tests\rules\Kernel;
 
 /**
@@ -33,11 +28,9 @@ class ConfigEntityDefaultsTest extends RulesDrupalTestBase {
   /**
    * Disable strict config schema checking for now.
    *
-   * @todo: Fix once config schema has been improved.
-   *
    * @var bool
    */
-  protected $strictConfigSchema = FALSE;
+  protected $strictConfigSchema = TRUE;
 
   /**
    * The entity type manager.

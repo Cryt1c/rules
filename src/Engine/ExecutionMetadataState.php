@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rules\Engine\ExecutionMetadataState.
- */
-
 namespace Drupal\rules\Engine;
 
 use Drupal\Core\Language\LanguageInterface;
@@ -96,7 +91,7 @@ class ExecutionMetadataState implements ExecutionMetadataStateInterface {
     try {
       // Support global context names as variable name by ignoring points in
       // the service name; e.g. @user.current_user_context:current_user.name.
-      if ($property_path[0] == '@') {
+      if (isset($property_path[0]) && $property_path[0] == '@') {
         list($service, $property_path) = explode(':', $property_path, 2);
       }
       $parts = explode('.', $property_path);
@@ -112,6 +107,15 @@ class ExecutionMetadataState implements ExecutionMetadataStateInterface {
       // Pass on the original exception in the exception trace.
       throw new IntegrityException($e->getMessage(), 0, $e);
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function autocomplete($partial_property_path) {
+    return $this
+        ->getDataFetcher()
+        ->autocompletePropertyPath($this->dataDefinitions, $partial_property_path);
   }
 
 }
