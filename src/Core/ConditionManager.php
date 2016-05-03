@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rules\Core\ConditionManager.
- */
-
 namespace Drupal\rules\Core;
 
 use Drupal\Core\Condition\ConditionManager as CoreConditionManager;
@@ -15,6 +10,16 @@ use Drupal\rules\Context\AnnotatedClassDiscovery;
  * Extends the core condition manager to add in Rules' context improvements.
  */
 class ConditionManager extends CoreConditionManager {
+
+  /**
+   * {@inheritdoc}
+   *
+   * @return \Drupal\rules\Core\RulesConditionInterface|\Drupal\Core\Condition\ConditionInterface
+   *   A fully configured plugin instance.
+   */
+  public function createInstance($plugin_id, array $configuration = []) {
+    return parent::createInstance($plugin_id, $configuration);
+  }
 
   /**
    * {@inheritdoc}

@@ -1,12 +1,9 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rules\Engine\RulesComponent.
- */
-
 namespace Drupal\rules\Engine;
 
+use Drupal\Core\Entity\DependencyTrait;
+use Drupal\rules\Context\ContextDefinition;
 use Drupal\rules\Context\ContextDefinitionInterface;
 use Drupal\rules\Exception\LogicException;
 
@@ -14,6 +11,8 @@ use Drupal\rules\Exception\LogicException;
  * Handles executable Rules components.
  */
 class RulesComponent {
+
+  use DependencyTrait;
 
   /**
    * The rules execution state.
@@ -56,6 +55,32 @@ class RulesComponent {
   }
 
   /**
+   * Creates a component based on the given configuration array.
+   *
+   * @param array $configuration
+   *   The component configuration, as returned from ::getConfiguration().
+   *
+   * @return static
+   */
+  public static function createFromConfiguration(array $configuration) {
+    $configuration += [
+      'context_definitions' => [],
+      'provided_context_definitions' => [],
+    ];
+    // @todo: Can we improve this use dependency injection somehow?
+    $expression_manager = \Drupal::service('plugin.manager.rules_expression');
+    $expression = $expression_manager->createInstance($configuration['expression']['id'], $configuration['expression']);
+    $component = static::create($expression);
+    foreach ($configuration['context_definitions'] as $name => $definition) {
+      $component->addContextDefinition($name, ContextDefinition::createFromArray($definition));
+    }
+    foreach ($configuration['provided_context_definitions'] as $name => $definition) {
+      $component->provideContext($name);
+    }
+    return $component;
+  }
+
+  /**
    * Constructs the object.
    *
    * @param \Drupal\rules\Engine\ExpressionInterface $expression
@@ -74,6 +99,27 @@ class RulesComponent {
    */
   public function getExpression() {
     return $this->expression;
+  }
+
+  /**
+   * Gets the configuration array of this component.
+   *
+   * @return array
+   *   The configuration of this component. It contains the following keys:
+   *   - expression: The configuration of the contained expression, including a
+   *     nested 'id' key.
+   *   - context_definitions: Array of context definition arrays, keyed by
+   *     context name.
+   *   - provided_context: The names of the context that is provided back.
+   */
+  public function getConfiguration() {
+    return [
+      'expression' => $this->expression->getConfiguration(),
+      'context_definitions' => array_map(function (ContextDefinitionInterface $definition) {
+        return $definition->toArray();
+      }, $this->contextDefinitions),
+      'provided_context_definitions' => $this->providedContext,
+    ];
   }
 
   /**
@@ -115,7 +161,8 @@ class RulesComponent {
    * Adds the available event context for the given events.
    *
    * @param string[] $event_names
-   *   The event names; e.g., as configured for a reaction rule.
+   *   The (fully qualified) event names; e.g., as configured for a reaction
+   *   rule.
    *
    * @return $this
    */
@@ -247,12 +294,55 @@ class RulesComponent {
   }
 
   /**
+   * Calculates dependencies for the component.
+   *
+   * @return array
+   *   An array of dependencies grouped by type (config, content, module,
+   *   theme).
+   *
+   * @see \Drupal\Component\Plugin\DependentPluginInterface::calculateDependencies()
+   */
+  public function calculateDependencies() {
+    // @todo: Complete implementation and add test coverage.
+    $this->addDependency('module', 'rules');
+    $this->addDependencies($this->getExpression()->calculateDependencies());
+    return $this->dependencies;
+  }
+
+  /**
    * PHP magic __clone function.
    */
   public function __clone() {
     // Implement a deep clone.
     $this->state = clone $this->state;
     $this->expression = clone $this->expression;
+  }
+
+  /**
+   * Returns autocomplete results for the given partial selector.
+   *
+   * Example: "node.uid.e" will return ["node.uid.entity"].
+   *
+   * @param string $partial_selector
+   *   The partial data selector.
+   * @param \Drupal\rules\Engine\ExpressionInterface $until
+   *   The expression in which the autocompletion will be executed. All
+   *   variables in the exection metadata state up to that point are available.
+   *
+   * @return array[]
+   *   A list of autocomplete suggestions - valid property paths for one of the
+   *   provided data definitions. Each entry is an array with the following
+   *   keys:
+   *   - value: the data selecor property path.
+   *   - label: the human readable label suggestion.
+   */
+  public function autocomplete($partial_selector, ExpressionInterface $until = NULL) {
+    // We use the integrity check to populate the execution metadata state with
+    // available variables.
+    $metadata_state = $this->getMetadataState();
+    $this->expression->prepareExecutionMetadataState($metadata_state, $until);
+
+    return $metadata_state->autocomplete($partial_selector);
   }
 
 }

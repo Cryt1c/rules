@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rules\Engine\ExecutionStateInterface.
- */
-
 namespace Drupal\rules\Engine;
 
 use Drupal\Core\TypedData\TypedDataInterface;
@@ -120,6 +115,15 @@ interface ExecutionStateInterface {
    * @return $this
    */
   public function saveChangesLater($selector);
+
+  /**
+   * Returns the list of variables that should be auto-saved after execution.
+   *
+   * @return string[]
+   *   The list of data selectors that specify the target object to be saved.
+   *   Example: node.uid.entity.
+   */
+  public function getAutoSaveSelectors();
 
   /**
    * Saves all variables that have been marked for auto saving.

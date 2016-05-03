@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\rules\Kernel\EventIntegrationTest.
- */
-
 namespace Drupal\Tests\rules\Kernel;
 
 use Drupal\rules\Context\ContextConfig;
@@ -30,7 +25,7 @@ class EventIntegrationTest extends RulesDrupalTestBase {
    *
    * @var array
    */
-  public static $modules = ['user'];
+  public static $modules = ['field', 'node', 'text', 'user'];
 
   /**
    * {@inheritdoc}
@@ -38,6 +33,15 @@ class EventIntegrationTest extends RulesDrupalTestBase {
   public function setUp() {
     parent::setUp();
     $this->storage = $this->container->get('entity_type.manager')->getStorage('rules_reaction_rule');
+
+    $this->installConfig(['system']);
+    $this->installConfig(['field']);
+    $this->installConfig(['node']);
+    $this->installSchema('node', ['node_access']);
+    $this->installSchema('system', ['sequences']);
+
+    $this->installEntitySchema('user');
+    $this->installEntitySchema('node');
   }
 
   /**
@@ -53,9 +57,8 @@ class EventIntegrationTest extends RulesDrupalTestBase {
 
     $config_entity = $this->storage->create([
       'id' => 'test_rule',
-      'expression_id' => 'rules_rule',
-      'event' => 'rules_user_login',
-      'configuration' => $rule->getConfiguration(),
+      'events' => [['event_name' => 'rules_user_login']],
+      'expression' => $rule->getConfiguration(),
     ]);
     $config_entity->save();
 
@@ -80,9 +83,8 @@ class EventIntegrationTest extends RulesDrupalTestBase {
 
     $config_entity = $this->storage->create([
       'id' => 'test_rule',
-      'expression_id' => 'rules_rule',
-      'event' => 'rules_user_logout',
-      'configuration' => $rule->getConfiguration(),
+      'events' => [['event_name' => 'rules_user_logout']],
+      'expression' => $rule->getConfiguration(),
     ]);
     $config_entity->save();
 
@@ -107,9 +109,8 @@ class EventIntegrationTest extends RulesDrupalTestBase {
 
     $config_entity = $this->storage->create([
       'id' => 'test_rule',
-      'expression_id' => 'rules_rule',
-      'event' => 'rules_system_cron',
-      'configuration' => $rule->getConfiguration(),
+      'events' => [['event_name' => 'rules_system_cron']],
+      'expression' => $rule->getConfiguration(),
     ]);
     $config_entity->save();
 
@@ -133,9 +134,8 @@ class EventIntegrationTest extends RulesDrupalTestBase {
 
     $config_entity = $this->storage->create([
       'id' => 'test_rule',
-      'expression_id' => 'rules_rule',
-      'event' => 'rules_system_logger_event',
-      'configuration' => $rule->getConfiguration(),
+      'events' => [['event_name' => 'rules_system_logger_event']],
+      'expression' => $rule->getConfiguration(),
     ]);
     $config_entity->save();
 
@@ -160,9 +160,8 @@ class EventIntegrationTest extends RulesDrupalTestBase {
 
     $config_entity = $this->storage->create([
       'id' => 'test_rule',
-      'expression_id' => 'rules_rule',
-      'event' => KernelEvents::REQUEST,
-      'configuration' => $rule->getConfiguration(),
+      'events' => [['event_name' => KernelEvents::REQUEST]],
+      'expression' => $rule->getConfiguration(),
     ]);
     $config_entity->save();
 
@@ -183,6 +182,101 @@ class EventIntegrationTest extends RulesDrupalTestBase {
 
     // Test that the action in the rule logged something.
     $this->assertRulesLogEntryExists('action called');
+  }
+
+  /**
+   * Test that rules config supports multiple events.
+   */
+  public function testMultipleEvents() {
+    $rule = $this->expressionManager->createRule();
+    $rule->addCondition('rules_test_true');
+    $rule->addAction('rules_test_log');
+
+    $config_entity = $this->storage->create([
+      'id' => 'test_rule',
+    ]);
+    $config_entity->set('events', [
+      ['event_name' => 'rules_user_login'],
+      ['event_name' => 'rules_user_logout'],
+    ]);
+    $config_entity->set('expression', $rule->getConfiguration());
+    $config_entity->save();
+
+    // The logger instance has changed, refresh it.
+    $this->logger = $this->container->get('logger.channel.rules');
+
+    $account = User::create(['name' => 'test_user']);
+    // Invoke the hook manually which should trigger the rules_user_login event.
+    rules_user_login($account);
+    // Invoke the hook manually which should trigger the rules_user_logout
+    // event.
+    rules_user_logout($account);
+
+    // Test that the action in the rule logged something.
+    $this->assertRulesLogEntryExists('action called');
+    $this->assertRulesLogEntryExists('action called', 1);
+  }
+
+  /**
+   * Tests that the entity presave/update events work with original entities.
+   *
+   * @param string $event_name
+   *   The event name that should be configured in the test rule.
+   *
+   * @dataProvider providerTestEntityOriginal
+   */
+  public function testEntityOriginal($event_name) {
+    // Create a node that we will change and save later.
+    $entity_type_manager = $this->container->get('entity_type.manager');
+    $entity_type_manager->getStorage('node_type')
+      ->create([
+        'type' => 'page',
+        'display_submitted' => FALSE,
+      ])
+      ->save();
+
+    $node = $entity_type_manager->getStorage('node')
+      ->create([
+        'title' => 'test',
+        'type' => 'page',
+      ]);
+    $node->save();
+
+    // Create a rule with a condition to compare the changed node title. If the
+    // title has changed the action is executed.
+    $rule = $this->expressionManager->createRule();
+    $rule->addCondition('rules_data_comparison', ContextConfig::create()
+      ->map('data', 'node.title.value')
+      ->map('value', 'node_unchanged.title.value')
+      ->negateResult()
+    );
+    $rule->addAction('rules_test_log');
+
+    $config_entity = $this->storage->create([
+      'id' => 'test_rule',
+      'events' => [['event_name' => $event_name]],
+      'expression' => $rule->getConfiguration(),
+    ]);
+    $config_entity->save();
+
+    // The logger instance has changed, refresh it.
+    $this->logger = $this->container->get('logger.channel.rules');
+
+    // Now change the title and trigger the presave event by savoing the node.
+    $node->setTitle('new title');
+    $node->save();
+
+    $this->assertRulesLogEntryExists('action called');
+  }
+
+  /**
+   * Provides test data for testentityOrigfinal().
+   */
+  public function providerTestEntityOriginal() {
+    return [
+      ['rules_entity_presave:node'],
+      ['rules_entity_update:node'],
+    ];
   }
 
 }

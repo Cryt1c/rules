@@ -1,14 +1,9 @@
 <?php
 
-/**
- * @file
- * Contains Drupal\Tests\rules\Kernel\RulesUiEmbedTest.
- */
-
 namespace Drupal\Tests\rules\Kernel;
 
-use Drupal\rules\Core\RulesUiConfigHandler;
-use Drupal\rules\Core\RulesUiDefinition;
+use Drupal\rules\Ui\RulesUiConfigHandler;
+use Drupal\rules\Ui\RulesUiDefinition;
 
 /**
  * Tests embedding the Rules UI.
@@ -27,7 +22,7 @@ class RulesUiEmbedTest extends RulesDrupalTestBase {
   /**
    * The rules UI manager.
    *
-   * @var \Drupal\rules\Core\RulesUiManagerInterface
+   * @var \Drupal\rules\Ui\RulesUiManagerInterface
    */
   protected $rulesUiManager;
 
@@ -41,14 +36,11 @@ class RulesUiEmbedTest extends RulesDrupalTestBase {
 
     $this->installConfig(['system']);
     $this->installConfig(['rules_test_ui_embed']);
-    $this->installSchema('system', ['router', 'sequences']);
-
-    // Make sure that the module routes get picked when used during rendering.
-    $this->container->get('router.builder')->rebuild();
+    $this->installSchema('system', ['sequences']);
   }
 
   /**
-   * @cover \Drupal\rules\Core\RulesUiManager
+   * @cover \Drupal\rules\Ui\RulesUiManager
    */
   public function testUiManager() {
     $definition = $this->rulesUiManager->getDefinitions();

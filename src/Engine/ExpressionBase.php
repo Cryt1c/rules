@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rules\Engine\ExpressionBase.
- */
-
 namespace Drupal\rules\Engine;
 
 use Drupal\Core\Plugin\PluginBase;
@@ -130,20 +125,6 @@ abstract class ExpressionBase extends PluginBase implements ExpressionInterface 
    */
   public function setRoot(ExpressionInterface $root) {
     $this->root = $root;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getConfigEntityId() {
-    return $this->configEntityId;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setConfigEntityId($id) {
-    $this->configEntityId = $id;
   }
 
   /**
