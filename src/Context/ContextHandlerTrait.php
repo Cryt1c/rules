@@ -6,12 +6,9 @@ use Drupal\Component\Plugin\Exception\ContextException;
 use Drupal\Core\Plugin\ContextAwarePluginInterface as CoreContextAwarePluginInterface;
 use Drupal\rules\Engine\ExecutionMetadataStateInterface;
 use Drupal\rules\Engine\ExecutionStateInterface;
-<<<<<<< HEAD
 use Drupal\rules\Exception\EvaluationException;
-=======
-use Drupal\rules\Exception\RulesEvaluationException;
-use Drupal\rules\Exception\RulesIntegrityException;
->>>>>>> upstream/8.x-3.x
+use Drupal\rules\Exception\IntegrityException;
+
 
 /**
  * Provides methods for handling context based on the plugin configuration.
@@ -45,23 +42,7 @@ trait ContextHandlerTrait {
    * @param \Drupal\rules\Engine\ExecutionStateInterface $state
    *   The execution state containing available variables.
    *
-<<<<<<< HEAD
    * @throws \Drupal\rules\Exception\EvaluationException
-   *   In case a required context is missing for the plugin.
-   */
-  protected function mapContext(CoreContextAwarePluginInterface $plugin, ExecutionStateInterface $state) {
-    $context_definitions = $plugin->getContextDefinitions();
-    foreach ($context_definitions as $name => $definition) {
-      // Check if a data selector is configured that maps to the state.
-      if (isset($this->configuration['context_mapping'][$name])) {
-        $typed_data = $state->fetchDataByPropertyPath($this->configuration['context_mapping'][$name]);
-
-        if ($typed_data->getValue() === NULL && !$definition->isAllowedNull()) {
-          throw new EvaluationException('The value of data selector '
-            . $this->configuration['context_mapping'][$name] . " is NULL, but the context $name in "
-            . $plugin->getPluginId() . ' requires a value.');
-=======
-   * @throws \Drupal\rules\Exception\RulesEvaluationException
    *   Thrown if some context is not satisfied; e.g. a required context is
    *   missing.
    *
@@ -96,16 +77,11 @@ trait ContextHandlerTrait {
       }
       catch (ContextException $e) {
         if (strpos($e->getMessage(), 'context is required') === FALSE) {
-          throw new RulesEvaluationException($e->getMessage());
->>>>>>> upstream/8.x-3.x
+          throw new EvaluationException($e->getMessage());
         }
       }
     }
 
-<<<<<<< HEAD
-        if ($this->configuration['context_values'][$name] === NULL && !$definition->isAllowedNull()) {
-          throw new EvaluationException("The context value for $name is NULL, but the context $name in "
-=======
     // Apply data processors.
     $this->processData($plugin, $state);
 
@@ -116,12 +92,11 @@ trait ContextHandlerTrait {
         // but valid (e.g. a reference on an empty property). In that case
         // isAllowedNull determines whether the context is conform.
         if (!isset($this->configuration['context_mapping'][$name])) {
-          throw new RulesEvaluationException("Required context $name is missing for plugin "
+          throw new EvaluationException("Required context $name is missing for plugin "
             . $plugin->getPluginId() . '.');
         }
         elseif (!$definition->isAllowedNull()) {
-          throw new RulesEvaluationException("The context for $name is NULL, but the context $name in "
->>>>>>> upstream/8.x-3.x
+          throw new EvaluationException("The context for $name is NULL, but the context $name in "
             . $plugin->getPluginId() . ' requires a value.');
         }
       }
@@ -151,11 +126,6 @@ trait ContextHandlerTrait {
       foreach ($this->configuration['context_values'] as $name => $value) {
         $plugin->setContextValue($name, $value);
       }
-<<<<<<< HEAD
-      elseif ($definition->isRequired()) {
-        throw new EvaluationException("Required context $name is missing for plugin "
-          . $plugin->getPluginId() . '.');
-=======
     }
 
     if ($plugin instanceof ContextAwarePluginInterface) {
@@ -195,12 +165,11 @@ trait ContextHandlerTrait {
         try {
           $selected_data[$name] = $this->getMappedDefinition($name, $metadata_state);
         }
-        catch (RulesIntegrityException $e) {
+        catch (IntegrityException $e) {
           // Ignore invalid data selectors here, such that context gets refined
           // as far as possible still and can be respected by the UI when fixing
           // broken selectors.
         }
->>>>>>> upstream/8.x-3.x
       }
     }
     return $selected_data;
@@ -218,7 +187,7 @@ trait ContextHandlerTrait {
    *   A data definition if the property path could be applied, or NULL if the
    *   context is not mapped.
    *
-   * @throws \Drupal\rules\Exception\RulesIntegrityException
+   * @throws \Drupal\rules\Exception\IntegrityException
    *   Thrown if the data selector that is configured for the context is
    *   invalid.
    */
@@ -329,5 +298,5 @@ trait ContextHandlerTrait {
       }
     }
   }
-
+  
 }

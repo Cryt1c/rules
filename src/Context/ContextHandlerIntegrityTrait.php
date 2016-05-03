@@ -7,16 +7,12 @@ use Drupal\Core\Plugin\ContextAwarePluginInterface as CoreContextAwarePluginInte
 use Drupal\Core\TypedData\DataDefinitionInterface;
 //@codingStandardsIgnoreStart
 use Drupal\rules\Context\ContextDefinitionInterface as RulesContextDefinitionInterface;
-<<<<<<< HEAD:src/Engine/IntegrityCheckTrait.php
 use Drupal\rules\Context\ContextProviderInterface;
 use Drupal\rules\Exception\IntegrityException;
-=======
 //@codingStandardsIgnoreEnd
 use Drupal\rules\Engine\ExecutionMetadataStateInterface;
 use Drupal\rules\Engine\IntegrityViolation;
 use Drupal\rules\Engine\IntegrityViolationList;
-use Drupal\rules\Exception\RulesIntegrityException;
->>>>>>> upstream/8.x-3.x:src/Context/ContextHandlerIntegrityTrait.php
 
 /**
  * Extends the context handler trait with support for checking integrity.

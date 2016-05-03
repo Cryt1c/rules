@@ -109,7 +109,7 @@ class RulesLoop extends ActionExpressionContainer {
       $list_item_definition = $list_definition->getItemDefinition();
       $metadata_state->setDataDefinition($this->configuration['list_item'], $list_item_definition);
     }
-    catch (RulesIntegrityException $e) {
+    catch (IntegrityException $e) {
       // Silently eat the exception: we just continue without adding the list
       // item definition to the state.
     }

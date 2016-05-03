@@ -82,7 +82,7 @@ interface ExecutionMetadataStateInterface {
 <<<<<<< HEAD
    * @throws \Drupal\rules\Exception\IntegrityException
 =======
-   * @throws \Drupal\rules\Exception\RulesIntegrityException
+   * @throws \Drupal\rules\Exception\IntegrityException
    *   Thrown if the property path is invalid.
 >>>>>>> upstream/8.x-3.x
    */
