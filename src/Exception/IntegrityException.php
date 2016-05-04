@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rules\Exception\IntegrityException.
- */
-
 namespace Drupal\rules\Exception;
 
 /**

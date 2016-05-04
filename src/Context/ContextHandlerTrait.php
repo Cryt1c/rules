@@ -9,7 +9,6 @@ use Drupal\rules\Engine\ExecutionStateInterface;
 use Drupal\rules\Exception\EvaluationException;
 use Drupal\rules\Exception\IntegrityException;
 
-
 /**
  * Provides methods for handling context based on the plugin configuration.
  *
