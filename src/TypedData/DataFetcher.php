@@ -76,7 +76,7 @@ class DataFetcher implements DataFetcherInterface {
         }
         else {
           $current_selector_string = implode('.', $current_selector);
-          throw new InvalidArgumentException("The parent property is not a list or a complex structure at '$current_selector_string'.");
+          throw new \InvalidArgumentException("The parent property is not a list or a complex structure at '$current_selector_string'.");
         }
 
         // If an accessed list item is not existing, $typed_data will be NULL.
@@ -94,10 +94,10 @@ class DataFetcher implements DataFetcherInterface {
       $current_selector = implode('.', $current_selector);
       throw new MissingDataException("Unable to apply data selector '$selector' at '$current_selector': " . $e->getMessage());
     }
-    catch (InvalidArgumentException $e) {
+    catch (\InvalidArgumentException $e) {
       $selector = implode('.', $sub_paths);
       $current_selector = implode('.', $current_selector);
-      throw new InvalidArgumentException("Unable to apply data selector '$selector' at '$current_selector': " . $e->getMessage());
+      throw new \InvalidArgumentException("Unable to apply data selector '$selector' at '$current_selector': " . $e->getMessage());
     }
 
   }
