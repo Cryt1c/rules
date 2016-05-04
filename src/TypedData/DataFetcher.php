@@ -94,7 +94,7 @@ class DataFetcher implements DataFetcherInterface {
       $current_selector = implode('.', $current_selector);
       throw new MissingDataException("Unable to apply data selector '$selector' at '$current_selector': " . $e->getMessage());
     }
-    catch (\InvalidArgumentException $e) {
+    catch (InvalidArgumentException $e) {
       $selector = implode('.', $sub_paths);
       $current_selector = implode('.', $current_selector);
       throw new InvalidArgumentException("Unable to apply data selector '$selector' at '$current_selector': " . $e->getMessage());
@@ -198,7 +198,7 @@ class DataFetcher implements DataFetcherInterface {
       try {
         $variable_definition = $this->fetchDefinitionByPropertyPath($data_definitions[$first_part], $middle_path);
       }
-      catch (\InvalidArgumentException $e) {
+      catch (InvalidArgumentException $e) {
         // Invalid property path, so no suggestions available.
         return [];
       }
