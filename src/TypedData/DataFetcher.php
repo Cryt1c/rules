@@ -99,7 +99,6 @@ class DataFetcher implements DataFetcherInterface {
       $current_selector = implode('.', $current_selector);
       throw new \InvalidArgumentException("Unable to apply data selector '$selector' at '$current_selector': " . $e->getMessage());
     }
-
   }
 
   /**
