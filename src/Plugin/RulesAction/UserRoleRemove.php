@@ -40,7 +40,7 @@ class UserRoleRemove extends RulesActionBase {
    *   User object the roles should be removed from.
    * @param \Drupal\user\RoleInterface[] $roles
    *   Array of user roles.
-   * 
+   *
    * @throws InvalidArgumentException
    */
   protected function doExecute(UserInterface $account, array $roles) {

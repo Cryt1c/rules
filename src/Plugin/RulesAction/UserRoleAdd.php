@@ -43,6 +43,7 @@ class UserRoleAdd extends RulesActionBase {
    *   User object.
    * @param \Drupal\user\RoleInterface[] $roles
    *   Array of UserRoles to assign.
+   *
    * @throws InvalidArgumentException
    */
   protected function doExecute(UserInterface $account, array $roles) {
